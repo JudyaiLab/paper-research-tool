@@ -113,11 +113,18 @@ def launch_web_ui(config, host: str = "127.0.0.1", port: int = 7860):
             arxiv_id = arxiv_match.group(1)
             url = f"https://arxiv.org/pdf/{arxiv_id}.pdf"
 
+        # Only allow http/https URLs
+        if not url.startswith(("http://", "https://")):
+            return ""
+
         if url.endswith(".pdf"):
             # Download PDF to temp file
             tmp = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
             try:
-                urllib.request.urlretrieve(url, tmp.name)
+                req = urllib.request.Request(url, headers={"User-Agent": "PaperResearchTool/0.3"})
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    with open(tmp.name, "wb") as f:
+                        f.write(resp.read())
                 text = parser.extract_text(tmp.name)
                 return text or ""
             finally:

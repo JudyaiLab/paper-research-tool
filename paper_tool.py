@@ -49,30 +49,31 @@ def _resolve_source(source: str) -> str:
     """Resolve a paper source (file path or arXiv URL) to extracted text."""
     parser = PDFParser()
 
+    def _download_pdf(url: str) -> str:
+        """Download PDF from URL with timeout and return extracted text."""
+        tmp = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "PaperResearchTool/0.3"})
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                with open(tmp.name, "wb") as f:
+                    f.write(resp.read())
+            text = parser.extract_text(tmp.name)
+            return text or ""
+        finally:
+            os.unlink(tmp.name)
+
     # arXiv URL → download PDF
     arxiv_match = re.match(r"https?://arxiv\.org/abs/(\d+\.\d+)", source)
     if arxiv_match:
         arxiv_id = arxiv_match.group(1)
         pdf_url = f"https://arxiv.org/pdf/{arxiv_id}.pdf"
         console.print(f"[cyan]Downloading arXiv paper {arxiv_id}...[/cyan]")
-        tmp = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
-        try:
-            urllib.request.urlretrieve(pdf_url, tmp.name)
-            text = parser.extract_text(tmp.name)
-            return text or ""
-        finally:
-            os.unlink(tmp.name)
+        return _download_pdf(pdf_url)
 
     # Direct PDF URL
-    if source.startswith("http") and source.endswith(".pdf"):
+    if source.startswith(("http://", "https://")) and source.endswith(".pdf"):
         console.print(f"[cyan]Downloading PDF from URL...[/cyan]")
-        tmp = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
-        try:
-            urllib.request.urlretrieve(source, tmp.name)
-            text = parser.extract_text(tmp.name)
-            return text or ""
-        finally:
-            os.unlink(tmp.name)
+        return _download_pdf(source)
 
     # Local file
     file_path = Path(source)

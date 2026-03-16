@@ -24,7 +24,7 @@ from core.ai_synthesizer import synthesize_literature_review, fetch_from_alphaxi
 from core.critical_analyzer import analyze_critically
 from core.gap_detector import detect_research_gaps
 from core.narrative_builder import build_research_narrative
-from core.config import load_config, get_ai_provider_info
+from core.config import load_config, get_ai_provider_info, SUPPORTED_LANGUAGES
 from templates.writing_templates import TEMPLATES
 
 
@@ -37,8 +37,8 @@ Examples:
   # Look up a paper
   python paper_tool_pro.py alphaxiv 2401.12345
 
-  # Literature review (up to 3 papers)
-  python paper_tool_pro.py synthesize --papers paper1.txt paper2.txt --topic "machine learning"
+  # Literature review (up to 3 papers, output in English)
+  python paper_tool_pro.py synthesize --papers paper1.txt paper2.txt --topic "machine learning" --lang en
 
   # Critical analysis
   python paper_tool_pro.py analyze --papers paper1.txt --framework strengths-weaknesses
@@ -65,6 +65,8 @@ Upgrade to Pro (up to 50 papers + Notion integration):
     synth_parser = subparsers.add_parser("synthesize", help="Generate literature review (up to 3 papers)")
     synth_parser.add_argument("--papers", nargs="+", required=True, help="Paper file paths or URLs")
     synth_parser.add_argument("--topic", required=True, help="Research topic")
+    synth_parser.add_argument("--lang", default="zh-TW", choices=list(SUPPORTED_LANGUAGES.keys()),
+                             help="Output language (default: zh-TW)")
     synth_parser.add_argument("--output", default="synthesis.md", help="Output file (default: synthesis.md)")
 
     # Critical analysis
@@ -73,18 +75,24 @@ Upgrade to Pro (up to 50 papers + Notion integration):
     crit_parser.add_argument("--framework", default="strengths-weaknesses",
                              choices=["strengths-weaknesses", "methodology", "comparative"],
                              help="Analysis framework (default: strengths-weaknesses)")
+    crit_parser.add_argument("--lang", default="zh-TW", choices=list(SUPPORTED_LANGUAGES.keys()),
+                             help="Output language (default: zh-TW)")
     crit_parser.add_argument("--output", default="analysis.md", help="Output file (default: analysis.md)")
 
     # Gap detection
     gap_parser = subparsers.add_parser("gaps", help="Research gap detection (up to 3 papers)")
     gap_parser.add_argument("--papers", nargs="+", required=True, help="Paper file paths or URLs")
     gap_parser.add_argument("--domain", required=True, help="Research domain")
+    gap_parser.add_argument("--lang", default="zh-TW", choices=list(SUPPORTED_LANGUAGES.keys()),
+                             help="Output language (default: zh-TW)")
     gap_parser.add_argument("--output", default="gaps.md", help="Output file (default: gaps.md)")
 
     # Narrative analysis
     narr_parser = subparsers.add_parser("narrative", help="Research narrative building (2-3 papers)")
     narr_parser.add_argument("--papers", nargs="+", required=True, help="Paper file paths or URLs (min 2)")
     narr_parser.add_argument("--my-topic", default=None, help="Your research topic (optional; generates Chapter 1 skeleton if provided)")
+    narr_parser.add_argument("--lang", default="zh-TW", choices=list(SUPPORTED_LANGUAGES.keys()),
+                             help="Output language (default: zh-TW)")
     narr_parser.add_argument("--output", default="storyline.md", help="Output file (default: storyline.md)")
 
     # AlphaXiv lookup
@@ -103,21 +111,21 @@ Upgrade to Pro (up to 50 papers + Notion integration):
     try:
         if args.command == "synthesize":
             print(f"📚 Generating literature review: {args.topic}")
-            result = synthesize_literature_review(args.papers, args.topic)
+            result = synthesize_literature_review(args.papers, args.topic, lang=args.lang)
             _save_output(result, args.output)
 
         elif args.command == "analyze":
             print(f"🔍 Running critical analysis ({args.framework})")
-            result = analyze_critically(args.papers, args.framework)
+            result = analyze_critically(args.papers, args.framework, lang=args.lang)
             _save_output(result, args.output)
 
         elif args.command == "gaps":
             print(f"🔬 Detecting research gaps: {args.domain}")
-            result = detect_research_gaps(args.papers, args.domain)
+            result = detect_research_gaps(args.papers, args.domain, lang=args.lang)
             _save_output(result, args.output)
 
         elif args.command == "narrative":
-            result = build_research_narrative(args.papers, args.my_topic)
+            result = build_research_narrative(args.papers, args.my_topic, lang=args.lang)
             _save_output(result, args.output)
 
         elif args.command == "alphaxiv":

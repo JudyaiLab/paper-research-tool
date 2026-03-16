@@ -19,6 +19,7 @@ Built for graduate students and researchers. Supports Gemini (free tier) / OpenA
 | 🔬 Research Gaps | Detect research gaps, generate research questions | Up to 3 papers |
 | 🧭 Research Narrative | Build paper storyline + Chapter 1 skeleton | 2-3 papers |
 | 📄 Paper Lookup | AlphaXiv / arXiv quick search | Unlimited |
+| 🌐 Multilingual Output | Supports zh-TW / English / Korean output | All analysis commands |
 | 📝 Writing Templates | Literature review, PRISMA, argumentative templates | Unlimited |
 
 > **Want more?** [Pro version](https://judyailab.com/products) supports up to 50 papers, auto-clustering, Notion integration, and citation graphs.
@@ -72,8 +73,11 @@ python paper_tool_pro.py config
 # Look up a paper (no AI needed)
 python paper_tool_pro.py alphaxiv 2401.12345
 
-# Literature review
+# Literature review (default: Traditional Chinese output)
 python paper_tool_pro.py synthesize --papers paper1.txt paper2.txt --topic "machine learning in education"
+
+# Literature review (English output)
+python paper_tool_pro.py synthesize --papers paper1.txt paper2.txt --topic "machine learning in education" --lang en
 
 # Critical analysis
 python paper_tool_pro.py analyze --papers paper1.txt --framework strengths-weaknesses

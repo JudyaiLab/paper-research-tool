@@ -5,13 +5,11 @@ AI Synthesizer — Literature review generation (free: up to 3 papers)
 from typing import List
 
 from core.ai_caller import call_ai
-from core.config import load_config
+from core.config import load_config, FREE_PAPER_LIMIT, get_lang_instruction
 from core.paper_reader import read_paper
 
-FREE_PAPER_LIMIT = 3
 
-
-def synthesize_literature_review(papers: List[str], topic: str) -> str:
+def synthesize_literature_review(papers: List[str], topic: str, lang: str = "zh-TW") -> str:
     """
     Generate a literature review from multiple papers.
 
@@ -36,7 +34,8 @@ def synthesize_literature_review(papers: List[str], topic: str) -> str:
 
     paper_text = "\n\n".join(paper_contents)
 
-    prompt = f"""你是一位學術研究助手。請根據以下論文，生成一篇關於「{topic}」的結構化文獻綜述。
+    lang_instruction = get_lang_instruction(lang)
+    prompt = f"""{lang_instruction}你是一位學術研究助手。請根據以下論文，生成一篇關於「{topic}」的結構化文獻綜述。
 
 要求：
 - 使用學術寫作風格

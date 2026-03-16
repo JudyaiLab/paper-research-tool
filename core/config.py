@@ -9,6 +9,23 @@ from pathlib import Path
 import yaml
 
 
+FREE_PAPER_LIMIT = 3
+MIN_NARRATIVE_PAPERS = 2
+
+SUPPORTED_LANGUAGES = {
+    "zh-TW": "繁體中文（Traditional Chinese）",
+    "en": "English",
+    "ko": "한국어（Korean）",
+}
+
+
+def get_lang_instruction(lang: str) -> str:
+    """Return a prompt instruction for the AI to respond in the given language."""
+    label = SUPPORTED_LANGUAGES.get(lang, lang)
+    if lang == "zh-TW":
+        return ""  # Prompts are already in Chinese, no extra instruction needed
+    return f"\n\n⚠️ IMPORTANT: You MUST write your ENTIRE response in {label}. Do NOT use any other language.\n\n"
+
 DEFAULT_CONFIG = {
     "ai": {
         "provider": "openai",  # openai | anthropic | gemini | ollama
@@ -31,7 +48,6 @@ DEFAULT_CONFIG = {
     },
     "defaults": {
         "output_dir": "./output",
-        "max_papers_free": 3,
         "language": "zh-TW",
     },
 }

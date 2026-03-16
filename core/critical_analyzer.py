@@ -5,13 +5,11 @@ Critical Analyzer — Paper critical analysis (free: up to 3 papers)
 from typing import List
 
 from core.ai_caller import call_ai
-from core.config import load_config
+from core.config import load_config, FREE_PAPER_LIMIT, get_lang_instruction
 from core.paper_reader import read_paper
 
-FREE_PAPER_LIMIT = 3
 
-
-def analyze_critically(papers: List[str], framework: str = "strengths-weaknesses") -> str:
+def analyze_critically(papers: List[str], framework: str = "strengths-weaknesses", lang: str = "zh-TW") -> str:
     """
     Perform critical analysis on papers using AI.
 
@@ -36,12 +34,13 @@ def analyze_critically(papers: List[str], framework: str = "strengths-weaknesses
 
     paper_text = "\n\n".join(paper_contents)
 
+    lang_instruction = get_lang_instruction(lang)
     if framework == "comparative":
-        prompt = _build_comparative_prompt(paper_text)
+        prompt = lang_instruction + _build_comparative_prompt(paper_text)
     elif framework == "methodology":
-        prompt = _build_methodology_prompt(paper_text)
+        prompt = lang_instruction + _build_methodology_prompt(paper_text)
     else:
-        prompt = _build_sw_prompt(paper_text)
+        prompt = lang_instruction + _build_sw_prompt(paper_text)
 
     config = load_config()
     print(f"  🤖 Running critical analysis with AI ({framework})...")

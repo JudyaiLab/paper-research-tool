@@ -323,9 +323,26 @@ Even with OpenAI or Claude, 100 analyses cost less than $1. With Gemini's free t
 
 This is a limitation of the free version. If you need to analyze more papers at once (up to 50), plus features like automatic Notion organization and paper relationship graphs, consider upgrading to the [Pro version](https://judyailab.com/products).
 
+### Q: Can I choose the output language?
+
+Yes! All analysis commands support the `--lang` flag:
+
+```bash
+# English output
+python3 paper_tool_pro.py synthesize --papers paper1.txt --topic "NLP" --lang en
+
+# Traditional Chinese output (default)
+python3 paper_tool_pro.py synthesize --papers paper1.txt --topic "NLP" --lang zh-TW
+
+# Korean output
+python3 paper_tool_pro.py synthesize --papers paper1.txt --topic "NLP" --lang ko
+```
+
+Supported languages: `zh-TW` (Traditional Chinese, default), `en` (English), `ko` (Korean).
+
 ### Q: Can it analyze papers written in languages other than English?
 
-Yes! The AI automatically detects the language, and both English and non-English papers are supported. You can even mix papers in different languages within the same analysis.
+Yes! The AI automatically detects the paper's language — both English and non-English papers are supported. You can even mix papers in different languages within the same analysis. The output language is controlled by `--lang`, independent of the paper's language.
 
 ### Q: Can I submit AI-generated content directly?
 

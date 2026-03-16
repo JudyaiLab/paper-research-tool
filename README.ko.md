@@ -19,6 +19,7 @@
 | 🔬 연구 갭 | 연구 공백 탐지, 연구 질문 생성 | 최대 3편 |
 | 🧭 연구 서사 | 논문 맥락 연결 + 논문 1장 골격 생성 | 2-3편 |
 | 📄 논문 검색 | AlphaXiv / arXiv 빠른 검색 | 무제한 |
+| 🌐 다국어 출력 | 繁中 / English / 한국어 출력 지원 | 모든 분석 명령 |
 | 📝 작성 템플릿 | 문헌 리뷰, PRISMA, 논증문 템플릿 | 무제한 |
 
 > **더 많은 기능이 필요하세요?** [Pro 버전](https://judyailab.com/products)은 최대 50편, 자동 클러스터링, Notion 연동, 인용 그래프를 지원합니다.
@@ -72,8 +73,11 @@ python paper_tool_pro.py config
 # 논문 검색 (AI 불필요)
 python paper_tool_pro.py alphaxiv 2401.12345
 
-# 문헌 리뷰
+# 문헌 리뷰 (기본: 繁體中文 출력)
 python paper_tool_pro.py synthesize --papers paper1.txt paper2.txt --topic "교육에서의 머신러닝"
+
+# 문헌 리뷰 (한국어 출력)
+python paper_tool_pro.py synthesize --papers paper1.txt paper2.txt --topic "교육에서의 머신러닝" --lang ko
 
 # 비판적 분석
 python paper_tool_pro.py analyze --papers paper1.txt --framework strengths-weaknesses

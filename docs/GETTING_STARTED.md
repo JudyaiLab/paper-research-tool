@@ -3,6 +3,8 @@
 > 這份教學是寫給「從來沒用過命令列」的碩博士生。
 > 每一步都有截圖等級的詳細說明，照著做就會動。
 
+Other languages: [English](GETTING_STARTED.en.md) | [한국어](GETTING_STARTED.ko.md)
+
 ---
 
 ## Phase 0：安裝環境（第一次才需要）
@@ -321,9 +323,26 @@ python3 paper_tool_pro.py templates
 
 這是免費版的限制。如果你需要一次分析更多論文（最多 50 篇）+ Notion 自動整理 + 論文關聯圖等進階功能，可以升級 [Pro 版](https://judyailab.com/products)。
 
+### Q：輸出語言可以選嗎？
+
+可以！所有分析指令都支援 `--lang` 參數：
+
+```bash
+# 繁體中文輸出（預設）
+python3 paper_tool_pro.py synthesize --papers paper1.txt --topic "NLP" --lang zh-TW
+
+# 英文輸出
+python3 paper_tool_pro.py synthesize --papers paper1.txt --topic "NLP" --lang en
+
+# 韓文輸出
+python3 paper_tool_pro.py synthesize --papers paper1.txt --topic "NLP" --lang ko
+```
+
+支援的語言：`zh-TW`（繁體中文，預設）、`en`（English）、`ko`（한국어）。
+
 ### Q：可以分析中文論文嗎？
 
-可以！AI 會自動偵測語言，中英文論文都支援。你也可以混合語言的論文一起分析。
+可以！AI 會自動偵測論文語言，中英文論文都支援。你也可以混合語言的論文一起分析。輸出語言由 `--lang` 決定，跟論文本身的語言無關。
 
 ### Q：AI 生成的內容可以直接交嗎？
 

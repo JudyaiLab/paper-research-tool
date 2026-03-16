@@ -5,13 +5,11 @@ Gap Detector — Research gap detection (free: up to 3 papers)
 from typing import List
 
 from core.ai_caller import call_ai
-from core.config import load_config
+from core.config import load_config, FREE_PAPER_LIMIT, get_lang_instruction
 from core.paper_reader import read_paper
 
-FREE_PAPER_LIMIT = 3
 
-
-def detect_research_gaps(papers: List[str], domain: str) -> str:
+def detect_research_gaps(papers: List[str], domain: str, lang: str = "zh-TW") -> str:
     """
     Detect research gaps from paper analysis using AI.
 
@@ -36,7 +34,8 @@ def detect_research_gaps(papers: List[str], domain: str) -> str:
 
     paper_text = "\n\n".join(paper_contents)
 
-    prompt = f"""你是一位資深學術研究顧問。請根據以下論文，找出「{domain}」領域的研究缺口。
+    lang_instruction = get_lang_instruction(lang)
+    prompt = f"""{lang_instruction}你是一位資深學術研究顧問。請根據以下論文，找出「{domain}」領域的研究缺口。
 
 要求：
 - 深入分析每篇論文回答了什麼問題、遺留了什麼問題

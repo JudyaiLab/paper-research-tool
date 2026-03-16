@@ -8,14 +8,11 @@ Without --my-topic: 2-section analysis + 3 research angle suggestions
 from typing import List, Optional
 
 from core.ai_caller import call_ai
-from core.config import load_config
+from core.config import load_config, FREE_PAPER_LIMIT, MIN_NARRATIVE_PAPERS, get_lang_instruction
 from core.paper_reader import read_paper
 
-FREE_PAPER_LIMIT = 3
-MIN_PAPERS = 2
 
-
-def build_research_narrative(papers: List[str], my_topic: Optional[str] = None) -> str:
+def build_research_narrative(papers: List[str], my_topic: Optional[str] = None, lang: str = "zh-TW") -> str:
     """
     Build a research narrative from multiple papers.
 
@@ -30,9 +27,9 @@ def build_research_narrative(papers: List[str], my_topic: Optional[str] = None) 
     Raises:
         RuntimeError: If fewer than 2 papers or AI call fails
     """
-    if len(papers) < MIN_PAPERS:
+    if len(papers) < MIN_NARRATIVE_PAPERS:
         raise RuntimeError(
-            f"Research narrative requires at least {MIN_PAPERS} papers to establish evolution.\n"
+            f"Research narrative requires at least {MIN_NARRATIVE_PAPERS} papers to establish evolution.\n"
             f"  Currently only {len(papers)} paper(s) provided. Please add more related papers."
         )
 
@@ -50,12 +47,13 @@ def build_research_narrative(papers: List[str], my_topic: Optional[str] = None) 
     paper_text = "\n\n".join(paper_contents)
     num_papers = len(papers)
 
+    lang_instruction = get_lang_instruction(lang)
     if my_topic:
         if len(my_topic) > 500:
             raise RuntimeError("Topic too long (max 500 chars). Please use a concise description.")
-        prompt = _build_narrative_prompt_with_topic(paper_text, my_topic.strip(), num_papers)
+        prompt = lang_instruction + _build_narrative_prompt_with_topic(paper_text, my_topic.strip(), num_papers)
     else:
-        prompt = _build_narrative_prompt_without_topic(paper_text, num_papers)
+        prompt = lang_instruction + _build_narrative_prompt_without_topic(paper_text, num_papers)
 
     config = load_config()
     mode = f"full narrative (topic: {my_topic})" if my_topic else "exploration (no topic specified)"

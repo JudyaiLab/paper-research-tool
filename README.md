@@ -19,6 +19,7 @@
 | 🔬 研究缺口 | 偵測研究空白、生成研究問題 | 一次最多 3 篇 |
 | 🧭 研究敘事 | 串論文脈絡、生成論文第一章骨架 | 2-3 篇 |
 | 📄 論文查詢 | AlphaXiv / arXiv 論文速查 | 無限制 |
+| 🌐 多語言輸出 | 支援繁中 / English / 한국어 輸出 | 所有分析指令 |
 | 📝 寫作模板 | 文獻綜述、PRISMA、議論文模板 | 無限制 |
 
 > **想要更多？** [Pro 版](https://judyailab.com/products) 支援一次 50 篇、自動分群、Notion 整合、論文關聯圖。
@@ -72,8 +73,11 @@ python paper_tool_pro.py config
 # 查詢論文（不需要 AI）
 python paper_tool_pro.py alphaxiv 2401.12345
 
-# 文獻綜述
+# 文獻綜述（預設繁體中文輸出）
 python paper_tool_pro.py synthesize --papers paper1.txt paper2.txt --topic "機器學習在教育上的應用"
+
+# 文獻綜述（英文輸出）
+python paper_tool_pro.py synthesize --papers paper1.txt paper2.txt --topic "ML in education" --lang en
 
 # 批判性分析
 python paper_tool_pro.py analyze --papers paper1.txt --framework strengths-weaknesses

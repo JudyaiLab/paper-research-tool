@@ -1,7 +1,7 @@
 """
-Paper Reader — 論文讀取共用模組
+Paper Reader — Shared module for reading paper content
 
-統一處理：本地檔案讀取、URL 抓取、字元截取。
+Handles: local file reading, URL fetching, content truncation.
 """
 
 import os
@@ -28,22 +28,22 @@ def read_paper(source: str) -> str:
     try:
         path = Path(os.path.expanduser(source)).resolve(strict=False)
     except (OSError, ValueError):
-        return f"[無效路徑: {source}]"
+        return f"[Invalid path: {source}]"
 
     if not path.is_file():
-        return f"[檔案不存在: {source}]"
+        return f"[File not found: {source}]"
 
     with open(path, "r", encoding="utf-8", errors="replace") as f:
         content = f.read()
 
     if len(content) > CONTENT_CHAR_LIMIT:
-        content = content[:CONTENT_CHAR_LIMIT] + f"\n\n[... 內容過長，已截取前 {CONTENT_CHAR_LIMIT} 字元 ...]"
+        content = content[:CONTENT_CHAR_LIMIT] + f"\n\n[... Content truncated at {CONTENT_CHAR_LIMIT} characters ...]"
     return content
 
 
 def _fetch_url(url: str) -> str:
     """
-    Fetch text content from URL (internal use).
+    Fetch text content from URL.
 
     Args:
         url: HTTP/HTTPS URL
@@ -56,7 +56,7 @@ def _fetch_url(url: str) -> str:
         with urllib.request.urlopen(req, timeout=30) as response:
             content = response.read().decode("utf-8", errors="replace")
         if len(content) > CONTENT_CHAR_LIMIT:
-            content = content[:CONTENT_CHAR_LIMIT] + "\n\n[... 內容過長，已截取 ...]"
+            content = content[:CONTENT_CHAR_LIMIT] + "\n\n[... Content truncated ...]"
         return content
     except Exception as e:
-        return f"[無法讀取 URL: {url} — {e}]"
+        return f"[Cannot fetch URL: {url} — {e}]"

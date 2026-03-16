@@ -126,12 +126,12 @@ python3 paper_tool_pro.py config
 아래와 비슷한 내용이 표시됩니다：
 
 ```
-⚙️  Paper Research Tool — AI 설정 상태
+⚙️  Paper Research Tool — AI Configuration
 
-  현재 AI 모델：OpenAI (gpt-4o-mini) — API Key: ✓
+  Current AI model: OpenAI (gpt-4o-mini) — API Key: ✓
 ```
 
-`✗ 설정되지 않음` 또는 `AI 모델을 감지할 수 없습니다`라고 나오면 위의 단계를 다시 확인해보세요.
+`✗ Not configured` 또는 `No AI model detected`라고 나오면 위의 단계를 다시 확인해보세요.
 
 ---
 

@@ -117,10 +117,6 @@ Upgrade to Pro (up to 50 papers + Notion integration):
             _save_output(result, args.output)
 
         elif args.command == "narrative":
-            if args.my_topic:
-                print(f"🧭 Building research narrative: {args.my_topic}")
-            else:
-                print("🧭 Exploring research landscape (no topic specified — will suggest entry points)")
             result = build_research_narrative(args.papers, args.my_topic)
             _save_output(result, args.output)
 

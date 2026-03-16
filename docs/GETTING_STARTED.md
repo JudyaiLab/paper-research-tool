@@ -124,12 +124,12 @@ python3 paper_tool_pro.py config
 會顯示類似：
 
 ```
-⚙️  Paper Research Tool — AI 設定狀態
+⚙️  Paper Research Tool — AI Configuration
 
-  當前 AI 模型：OpenAI (gpt-4o-mini) — API Key: ✓
+  Current AI model: OpenAI (gpt-4o-mini) — API Key: ✓
 ```
 
-如果看到 `✗ 未設定` 或 `未偵測到任何 AI 模型`，回去檢查上面的步驟。
+如果看到 `✗ Not configured` 或 `No AI model detected`，回去檢查上面的步驟。
 
 ---
 
@@ -355,4 +355,4 @@ python3 paper_tool_pro.py templates
 
 ---
 
-*Made with ❤️ by [Judy AI Lab](https://judyailab.com/products)*
+*Made with ❤️ by [Judy AI Lab](https://judyailab.com)*

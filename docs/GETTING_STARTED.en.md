@@ -126,9 +126,9 @@ python3 paper_tool_pro.py config
 You should see something like:
 
 ```
-⚙️  Paper Research Tool — AI Configuration Status
+⚙️  Paper Research Tool — AI Configuration
 
-  Current AI Model: OpenAI (gpt-4o-mini) — API Key: ✓
+  Current AI model: OpenAI (gpt-4o-mini) — API Key: ✓
 ```
 
 If you see `✗ Not configured` or `No AI model detected`, go back and check the steps above.

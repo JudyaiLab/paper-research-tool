@@ -114,6 +114,21 @@ python paper_tool.py serve
 | 知識庫 | 有 | — |
 | 語言 | 3 種 | 3 種 |
 
+## Windows 使用者
+
+如果遇到 `UnicodeEncodeError: 'cp949'` 或 `'cp1252'` 等編碼錯誤，請在執行前設定環境變數：
+
+```bash
+set PYTHONUTF8=1
+```
+
+或在 PowerShell 中：
+
+```powershell
+$env:PYTHONUTF8 = "1"
+python paper_tool.py summarize paper.pdf
+```
+
 ## 測試
 
 ```bash

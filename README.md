@@ -125,6 +125,23 @@ language: en                   # zh-TW | en | ko
 | Knowledge base | Yes | — |
 | Languages | 3 | 3 |
 
+## Windows Users
+
+If you see encoding errors like `UnicodeEncodeError: 'cp949'` or `'cp1252'`, set these environment variables before running:
+
+```bash
+set PYTHONUTF8=1
+```
+
+Or in PowerShell:
+
+```powershell
+$env:PYTHONUTF8 = "1"
+python paper_tool.py summarize paper.pdf
+```
+
+This ensures Python uses UTF-8 encoding regardless of your system locale.
+
 ## Testing
 
 ```bash

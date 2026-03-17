@@ -9,6 +9,110 @@ from typing import List, Optional
 from core.i18n import t
 
 
+# ── Anti-hallucination relation prompts (trilingual) ──────────
+
+_RELATION_PROMPTS = {
+    "zh-TW": """你是一位嚴謹的學術文獻比較分析專家。你的任務是分析兩篇論文之間的關聯性。
+
+⚠️ 鐵則（違反任何一條 = 分析無效）：
+1. 只能引用「下方提供的論文文本」中明確出現的內容。不可臆測、不可補充外部知識。
+2. 每一個關聯判斷都必須附上「出自哪篇論文的哪段文字」作為證據。找不到證據 = 不能宣稱有關聯。
+3. 如果兩篇論文確實沒有明顯關聯，就直接說「關聯薄弱」，不要硬湊。誠實比好看重要。
+4. 信心度必須如實標註：HIGH（有直接文本證據）/ MEDIUM（有間接推論但有文本支撐）/ LOW（僅憑主題相似的猜測）。
+
+===== 論文 1：{title1} =====
+{text1}
+
+===== 論文 2：{title2} =====
+{text2}
+
+請依照以下格式嚴格輸出：
+
+SCORE: [0-100]%
+CONFIDENCE: [HIGH/MEDIUM/LOW]
+TYPE: [延伸/修正/挑戰/平行/互補/奠基/無明顯關聯]
+
+EVIDENCE:
+- [證據 1]：「引用原文片段」（出自論文 1/2）→ 支持什麼判斷
+- [證據 2]：「引用原文片段」（出自論文 1/2）→ 支持什麼判斷
+（至少 2 條，找不到就寫「未找到直接文本證據」）
+
+ANALYSIS:
+[基於上述證據的分析。每個論點都必須對應到 EVIDENCE 區的證據編號。]
+
+SELF-CHECK:
+- 是否每個論點都有原文證據？[是/否]
+- 是否有超出提供文本的推論？[是/否，如果是請標明哪些]
+- 信心度是否準確反映了證據強度？[是/否]""",
+
+    "en": """You are a rigorous academic literature comparison specialist. Your task is to analyze the relationship between two papers.
+
+⚠️ STRICT RULES (violating any = invalid analysis):
+1. You may ONLY reference content explicitly present in the provided paper texts below. Do NOT infer, speculate, or add external knowledge.
+2. Every relationship claim MUST include a direct quote from the paper text as evidence. No evidence = no claim.
+3. If the two papers have no clear relationship, say "weak/no relationship" directly. Honesty > aesthetics.
+4. Confidence must be labeled accurately: HIGH (direct textual evidence) / MEDIUM (indirect inference with textual support) / LOW (topic-similarity guess only).
+
+===== Paper 1: {title1} =====
+{text1}
+
+===== Paper 2: {title2} =====
+{text2}
+
+Respond in the following strict format:
+
+SCORE: [0-100]%
+CONFIDENCE: [HIGH/MEDIUM/LOW]
+TYPE: [extends/revises/challenges/parallel/complementary/foundational/no clear relationship]
+
+EVIDENCE:
+- [Evidence 1]: "[direct quote from text]" (from Paper 1/2) → supports what claim
+- [Evidence 2]: "[direct quote from text]" (from Paper 1/2) → supports what claim
+(minimum 2 pieces; if none found, write "No direct textual evidence found")
+
+ANALYSIS:
+[Analysis based on the evidence above. Each argument must reference an evidence number from the EVIDENCE section.]
+
+SELF-CHECK:
+- Does every argument have textual evidence? [Yes/No]
+- Are there any inferences beyond the provided text? [Yes/No, if yes specify which]
+- Does the confidence level accurately reflect the evidence strength? [Yes/No]""",
+
+    "ko": """당신은 엄격한 학술 문헌 비교 분석 전문가입니다. 두 논문 간의 관계를 분석하는 것이 과제입니다.
+
+⚠️ 철칙 (위반 시 분석 무효):
+1. 아래 제공된 논문 텍스트에 명시적으로 존재하는 내용만 인용할 수 있습니다. 추측, 외부 지식 추가 금지.
+2. 모든 관계 판단에는 「어느 논문의 어떤 텍스트에서」 나온 것인지 증거를 반드시 첨부해야 합니다. 증거 없음 = 관계 주장 불가.
+3. 두 논문에 명확한 관계가 없다면 「관계 약함」이라고 직접 말하세요. 정직함 > 보기 좋음.
+4. 신뢰도는 정확하게 표기: HIGH (직접적 텍스트 증거) / MEDIUM (간접 추론이지만 텍스트 지원 있음) / LOW (주제 유사성에 기반한 추측).
+
+===== 논문 1: {title1} =====
+{text1}
+
+===== 논문 2: {title2} =====
+{text2}
+
+다음 형식에 따라 엄격하게 출력하세요:
+
+SCORE: [0-100]%
+CONFIDENCE: [HIGH/MEDIUM/LOW]
+TYPE: [확장/수정/도전/병행/보완/기초/명확한 관계 없음]
+
+EVIDENCE:
+- [증거 1]: "원문 인용" (논문 1/2에서) → 어떤 판단을 지지하는지
+- [증거 2]: "원문 인용" (논문 1/2에서) → 어떤 판단을 지지하는지
+(최소 2개, 찾을 수 없으면 "직접적 텍스트 증거를 찾을 수 없음"이라고 작성)
+
+ANALYSIS:
+[위 증거에 기반한 분석. 각 논점은 EVIDENCE 섹션의 증거 번호를 참조해야 합니다.]
+
+SELF-CHECK:
+- 모든 논점에 텍스트 증거가 있는가? [예/아니오]
+- 제공된 텍스트를 초과하는 추론이 있는가? [예/아니오, 있다면 어떤 것인지 명시]
+- 신뢰도가 증거 강도를 정확히 반영하는가? [예/아니오]""",
+}
+
+
 class RelationGraph:
     """Paper relation graph analysis with AI support."""
 
@@ -81,6 +185,7 @@ class RelationGraph:
         """Use AI for deep relation analysis. Returns None if AI unavailable."""
         try:
             from core.ai_summarizer import AISummarizer
+            from core.i18n import get_lang
             summarizer = AISummarizer(self.config)
 
             api_key = summarizer._get_api_key()
@@ -92,53 +197,74 @@ class RelationGraph:
             summary1 = paper1.get("summary", paper1.get("text", "")[:2000])
             summary2 = paper2.get("summary", paper2.get("text", "")[:2000])
 
-            prompt = f"""Analyze the relationship between these two academic papers.
-
-Paper 1: {title1}
-{summary1[:3000]}
-
-Paper 2: {title2}
-{summary2[:3000]}
-
-Provide:
-1. Relationship score (0-100%)
-2. Relationship type (e.g., extends, contradicts, parallel, complementary, foundational)
-3. Detailed analysis of how these papers relate to each other (shared themes, methodological connections, how one builds on or challenges the other)
-
-Format your response as:
-SCORE: [number]%
-TYPE: [relationship type]
-ANALYSIS:
-[your detailed analysis]"""
+            lang = get_lang()
+            prompt = _RELATION_PROMPTS.get(lang, _RELATION_PROMPTS["en"]).format(
+                title1=title1,
+                text1=summary1[:3000],
+                title2=title2,
+                text2=summary2[:3000],
+            )
 
             result = summarizer.summarize("", prompt)
             if not result or result.startswith("Error") or "API" in result[:30]:
                 return None
 
-            # Parse AI response
+            # Parse structured AI response
             score = 0.5
+            confidence = ""
             rel_type = ""
-            analysis = result
+            evidence_lines = []
+            analysis = ""
+            self_check = ""
 
+            current_section = None
             for line in result.split("\n"):
-                line_stripped = line.strip()
-                if line_stripped.upper().startswith("SCORE:"):
-                    try:
-                        num = re.search(r'(\d+)', line_stripped)
-                        if num:
-                            score = int(num.group(1)) / 100.0
-                    except (ValueError, AttributeError):
-                        pass
-                elif line_stripped.upper().startswith("TYPE:"):
-                    rel_type = line_stripped.split(":", 1)[1].strip()
-                elif line_stripped.upper().startswith("ANALYSIS:"):
-                    idx = result.find(line_stripped)
-                    analysis = result[idx + len(line_stripped):].strip()
+                stripped = line.strip()
+                upper = stripped.upper()
+
+                if upper.startswith("SCORE:"):
+                    num = re.search(r'(\d+)', stripped)
+                    if num:
+                        score = min(int(num.group(1)) / 100.0, 1.0)
+                    current_section = None
+                elif upper.startswith("CONFIDENCE:"):
+                    confidence = stripped.split(":", 1)[1].strip()
+                    current_section = None
+                elif upper.startswith("TYPE:"):
+                    rel_type = stripped.split(":", 1)[1].strip()
+                    current_section = None
+                elif upper.startswith("EVIDENCE:"):
+                    current_section = "evidence"
+                elif upper.startswith("ANALYSIS:"):
+                    current_section = "analysis"
+                elif upper.startswith("SELF-CHECK:"):
+                    current_section = "selfcheck"
+                elif current_section == "evidence" and stripped:
+                    evidence_lines.append(stripped)
+                elif current_section == "analysis" and stripped:
+                    analysis += stripped + "\n"
+                elif current_section == "selfcheck" and stripped:
+                    self_check += stripped + "\n"
+
+            # Build full reasoning output
+            reasoning_parts = []
+            if confidence:
+                confidence_label = {"HIGH": "🟢", "MEDIUM": "🟡", "LOW": "🔴"}.get(
+                    confidence.upper(), "⚪"
+                )
+                reasoning_parts.append(f"{confidence_label} Confidence: {confidence}")
+            if evidence_lines:
+                reasoning_parts.append("\n📎 Evidence:")
+                reasoning_parts.extend(f"  {e}" for e in evidence_lines)
+            if analysis:
+                reasoning_parts.append(f"\n📝 Analysis:\n{analysis.strip()}")
+            if self_check:
+                reasoning_parts.append(f"\n✅ Self-check:\n{self_check.strip()}")
 
             return {
-                "score": min(score, 1.0),
+                "score": score,
                 "type": rel_type or t("rg_possibly_related"),
-                "reasoning": analysis,
+                "reasoning": "\n".join(reasoning_parts) if reasoning_parts else result,
             }
         except Exception:
             return None

@@ -236,7 +236,7 @@ def cmd_search(args, config) -> int:
 def cmd_relate(args, config) -> int:
     """Analyze paper relations."""
     kb = KnowledgeBase()
-    rg = RelationGraph(kb)
+    rg = RelationGraph(kb, config=config)
 
     relation = rg.analyze_relation(args.paper1, args.paper2)
 

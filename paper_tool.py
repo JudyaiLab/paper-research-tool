@@ -11,6 +11,7 @@ import sys
 import argparse
 import tempfile
 import urllib.request
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 # Add project root to path
@@ -28,7 +29,25 @@ from rich.table import Table
 
 console = Console()
 
-VERSION = "0.3.0"
+VERSION = "0.3.1"
+
+
+def _fetch_arxiv_title(arxiv_id: str) -> str:
+    """Fetch paper title from arXiv API. Returns empty string on failure."""
+    try:
+        url = f"https://export.arxiv.org/api/query?id_list={arxiv_id}"
+        req = urllib.request.Request(url, headers={"User-Agent": "PaperResearchTool/0.3"})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            root = ET.fromstring(resp.read())
+            ns = "{http://www.w3.org/2005/Atom}"
+            entry = root.find(f"{ns}entry")
+            if entry is not None:
+                title_el = entry.find(f"{ns}title")
+                if title_el is not None and title_el.text:
+                    return title_el.text.strip().replace("\n", " ")
+    except Exception:
+        pass
+    return ""
 
 # ── Content limit ──────────────────────────────────────────
 CONTENT_LIMIT = 25_000  # characters sent to AI
@@ -52,15 +71,17 @@ def _resolve_source(source: str) -> str:
     def _download_pdf(url: str) -> str:
         """Download PDF from URL with timeout and return extracted text."""
         tmp = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
+        tmp_path = tmp.name
+        tmp.close()  # Close before reuse — Windows locks open files
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "PaperResearchTool/0.3"})
             with urllib.request.urlopen(req, timeout=30) as resp:
-                with open(tmp.name, "wb") as f:
+                with open(tmp_path, "wb") as f:
                     f.write(resp.read())
-            text = parser.extract_text(tmp.name)
+            text = parser.extract_text(tmp_path)
             return text or ""
         finally:
-            os.unlink(tmp.name)
+            os.unlink(tmp_path)
 
     # arXiv URL → download PDF
     arxiv_match = re.match(r"https?://arxiv\.org/abs/(\d+\.\d+)", source)
@@ -137,7 +158,13 @@ def cmd_summarize(args, config) -> int:
         prompt = pm.get_prompt("basic_summary", text[:CONTENT_LIMIT])
         summary = summarizer.summarize(text[:CONTENT_LIMIT], prompt=prompt)
 
-        title = source_name.replace("_", " ").replace("-", " ").replace(".pdf", "").title()
+        # Extract real title: arXiv API > filename fallback
+        title = ""
+        arxiv_match = re.match(r"https?://arxiv\.org/abs/(\d+\.\d+)", source)
+        if arxiv_match:
+            title = _fetch_arxiv_title(arxiv_match.group(1))
+        if not title:
+            title = source_name.replace("_", " ").replace("-", " ").replace(".pdf", "").title()
         paper = {
             "title": title,
             "source": source,
@@ -234,21 +261,40 @@ def cmd_config(args, config) -> int:
 
     if args.openai_key:
         config.set("openai_api_key", args.openai_key)
+        _auto_switch_provider(config, "openai")
         console.print(f"[green]{t('openai_key_saved')}[/green]")
 
     if args.anthropic_key:
         config.set("anthropic_api_key", args.anthropic_key)
+        _auto_switch_provider(config, "anthropic")
         console.print(f"[green]{t('anthropic_key_saved')}[/green]")
 
     if args.google_key:
         config.set("google_api_key", args.google_key)
+        _auto_switch_provider(config, "google")
         console.print(f"[green]{t('google_key_saved')}[/green]")
 
     if args.openrouter_key:
         config.set("openrouter_api_key", args.openrouter_key)
+        _auto_switch_provider(config, "openrouter")
         console.print(f"[green]{t('openrouter_key_saved')}[/green]")
 
     return 0
+
+
+def _auto_switch_provider(config, provider: str):
+    """Auto-switch default_provider when current provider has no key set."""
+    current = config.get("default_provider", "openai")
+    current_key_map = {
+        "openai": "openai_api_key",
+        "anthropic": "anthropic_api_key",
+        "google": "google_api_key",
+        "openrouter": "openrouter_api_key",
+    }
+    # Switch if current provider has no key
+    if not config.get(current_key_map.get(current, ""), ""):
+        config.set("default_provider", provider)
+        console.print(f"[cyan]Default provider switched to {provider}[/cyan]")
 
 
 def cmd_serve(args, config) -> int:

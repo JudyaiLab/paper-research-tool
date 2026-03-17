@@ -3,6 +3,7 @@ Markdown Knowledge Base Manager / 知識庫管理模組
 """
 
 import json
+import re
 from pathlib import Path
 from datetime import datetime
 from typing import List, Optional
@@ -51,7 +52,7 @@ class KnowledgeBase:
         index = self._load_index()
 
         paper_id = paper.get("title", f"paper_{len(index['papers']) + 1}")
-        paper_id = paper_id.lower().replace(" ", "_")[:50]
+        paper_id = re.sub(r'[^\w\s-]', '', paper_id.lower()).replace(" ", "_")[:50]
 
         md_content = self._generate_markdown(paper)
         md_file = self.kb_path / f"{paper_id}.md"

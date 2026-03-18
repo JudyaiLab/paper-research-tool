@@ -108,7 +108,7 @@ language: en                   # zh-TW | en | ko
 
 ## Free vs Pro
 
-| Feature | Free | [Pro](https://judyailab.gumroad.com) |
+| Feature | Free | [Pro](https://miranttie.gumroad.com/l/literature-reviewCN) |
 |---------|:----:|:----:|
 | AI Providers | 4 | 4 |
 | Papers per run | Batch | Batch (up to 50) |

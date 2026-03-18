@@ -97,7 +97,7 @@ python paper_tool.py serve
 
 ## 免費版 vs Pro
 
-| 功能 | 免費 | [Pro](https://judyailab.gumroad.com) |
+| 功能 | 免費 | [Pro](https://miranttie.gumroad.com/l/literature-reviewCN) |
 |------|:----:|:----:|
 | AI 引擎 | 4 家 | 4 家 |
 | 每次論文數 | 批次 | 批次（最多 50） |
